@@ -60,6 +60,9 @@ cd src && ../.venv/Scripts/python.exe main.py  # app interactiva (opcional)
   `subtotal - descuento > 200`.
 - **Formato de montos**: se usa `str(round(v, 2))` (imprime `185.0`, no
   `185.00`). No cambiar a f-strings con `:.2f`.
+- **Tipos de los montos**: sin descuento, `venta["descuento"]` es el entero
+  `0` (no `0.0`), y el total de un día sin ventas se imprime `$0`. Inicializar
+  acumuladores y descuentos con `0`, no con `0.0`.
 - **`mas_vendidos`**: el orden de los empates debe conservarse
   (`sorted(..., reverse=True)` es estable).
 - **Contador de folios**: `almacen.py` lee y escribe el contador de `gestor`;
