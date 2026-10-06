@@ -52,23 +52,17 @@ def total_vendido():
 
 def mas_vendidos(n=3):
     """Regresa los n productos mas vendidos como lista de (codigo, unidades)."""
-    aux = {}
-    for v in gestor.VENTAS:
-        if v["codigo"] in aux:
-            aux[v["codigo"]] = aux[v["codigo"]] + v["cantidad"]
-        else:
-            aux[v["codigo"]] = v["cantidad"]
-    temp = []
-    for k in aux:
-        temp.append((k, aux[k]))
-    # ordenamiento de burbuja (TODO: algun dia usar sorted)
-    for i in range(len(temp)):
-        for j in range(0, len(temp) - i - 1):
-            if temp[j][1] < temp[j + 1][1]:
-                t = temp[j]
-                temp[j] = temp[j + 1]
-                temp[j + 1] = t
-    return temp[0:n]
+    unidades_por_codigo = {}
+    for venta in gestor.VENTAS:
+        codigo = venta["codigo"]
+        unidades_por_codigo[codigo] = (
+            unidades_por_codigo.get(codigo, 0) + venta["cantidad"]
+        )
+    # sorted es estable: en empates se conserva el orden de la primera venta
+    ranking = sorted(
+        unidades_por_codigo.items(), key=lambda par: par[1], reverse=True
+    )
+    return ranking[:n]
 
 
 def resumen_ventas():
