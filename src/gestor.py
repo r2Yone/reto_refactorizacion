@@ -29,21 +29,21 @@ FORMATO_FECHA = "%Y-%m-%d %H:%M:%S"
 # ---------------------------------------------------------------
 INVENTARIO = {}
 VENTAS = []
-contadorVentas = 0
+contador_ventas = 0
 ultimo_error = ""
 
 
 def reiniciar_sistema():
     """Borra todo el estado del sistema (inventario, ventas y folios)."""
-    global contadorVentas, ultimo_error
+    global contador_ventas, ultimo_error
     INVENTARIO.clear()
     VENTAS.clear()
-    contadorVentas = 0
+    contador_ventas = 0
     ultimo_error = ""
 
 
 def agregarProducto(codigo, nombre, precio, stock):
-    # valida los datos y da de alta un producto en el inventario
+    """Valida los datos y da de alta un producto en el inventario."""
     global ultimo_error
     if codigo is None or codigo == "":
         ultimo_error = "codigo vacio"
@@ -57,12 +57,12 @@ def agregarProducto(codigo, nombre, precio, stock):
     if stock < 0:
         ultimo_error = "stock invalido"
         return False
-    x = {}
-    x["codigo"] = codigo
-    x["nombre"] = nombre
-    x["precio"] = precio
-    x["stock"] = stock
-    INVENTARIO[codigo] = x
+    INVENTARIO[codigo] = {
+        "codigo": codigo,
+        "nombre": nombre,
+        "precio": precio,
+        "stock": stock,
+    }
     return True
 
 
@@ -82,21 +82,21 @@ def actualizar_stock(codigo, cantidad):
     if codigo not in INVENTARIO:
         ultimo_error = "producto no existe"
         return False
-    aux = INVENTARIO[codigo]["stock"] + cantidad
-    if aux < 0:
+    nuevo_stock = INVENTARIO[codigo]["stock"] + cantidad
+    if nuevo_stock < 0:
         ultimo_error = "el stock no puede quedar negativo"
         return False
-    INVENTARIO[codigo]["stock"] = aux
+    INVENTARIO[codigo]["stock"] = nuevo_stock
     return True
 
 
 def buscarProducto(texto):
-    # busca productos cuyo nombre contenga el texto (sin importar mayusculas)
-    temp2 = []
-    for k in INVENTARIO:
-        if texto.lower() in INVENTARIO[k]["nombre"].lower():
-            temp2.append(INVENTARIO[k])
-    return temp2
+    """Productos cuyo nombre contiene el texto, sin importar mayusculas."""
+    return [
+        producto
+        for producto in INVENTARIO.values()
+        if texto.lower() in producto["nombre"].lower()
+    ]
 
 
 def _descuento_por_volumen(subtotal):
@@ -161,7 +161,7 @@ def registrar_venta(codigo, cantidad, cliente=""):
 
     Si algo falla regresa None y deja el motivo en ultimo_error.
     """
-    global contadorVentas, ultimo_error
+    global contador_ventas, ultimo_error
     error = _validar_venta(codigo, cantidad)
     if error is not None:
         ultimo_error = error
@@ -174,9 +174,9 @@ def registrar_venta(codigo, cantidad, cliente=""):
     impuesto = _calcular_iva(base)
 
     producto["stock"] = producto["stock"] - cantidad
-    contadorVentas = contadorVentas + 1
+    contador_ventas = contador_ventas + 1
     venta = {
-        "folio": contadorVentas,
+        "folio": contador_ventas,
         "codigo": codigo,
         "nombre": producto["nombre"],
         "cantidad": cantidad,

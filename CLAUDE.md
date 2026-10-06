@@ -63,9 +63,12 @@ cd src && ../.venv/Scripts/python.exe main.py  # app interactiva (opcional)
 - **Tipos de los montos**: sin descuento, `venta["descuento"]` es el entero
   `0` (no `0.0`), y el total de un día sin ventas se imprime `$0`. Inicializar
   acumuladores y descuentos con `0`, no con `0.0`.
+- **No usar `sum()` para acumular montos**: desde Python 3.12 usa suma
+  compensada y puede diferir del bucle original en el último decimal
+  (10 × 0.1 → `0.9999999999999999` con bucle, `1.0` con `sum()`).
 - **`mas_vendidos`**: el orden de los empates debe conservarse
   (`sorted(..., reverse=True)` es estable).
-- **Contador de folios**: `almacen.py` lee y escribe el contador de `gestor`;
+- **Contador de folios**: `almacen.py` lee y escribe `gestor.contador_ventas`;
   si se renombra, hay que actualizar ambos archivos en el mismo cambio.
 - **Ruta de datos**: `main.py` abre `datos_ejemplo.json` relativo al
   directorio actual. Desde `src/` no encuentra el archivo de la raíz. Es

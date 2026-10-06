@@ -6,43 +6,48 @@ import gestor
 STOCK_MINIMO = 5
 
 
-def hacer_cosa(v):
-    # le da formato de dinero al numero
-    return "$" + str(round(v, 2))
+def formatear_dinero(monto):
+    """Da formato de dinero a un monto, p. ej. 185.0 -> "$185.0"."""
+    return "$" + str(round(monto, 2))
 
 
 def productos_stock_bajo():
     """Regresa la lista de productos con stock por debajo del minimo."""
-    temp2 = []
-    for k in gestor.INVENTARIO:
-        if gestor.INVENTARIO[k]["stock"] < STOCK_MINIMO:
-            temp2.append(gestor.INVENTARIO[k])
-    return temp2
+    return [
+        producto
+        for producto in gestor.INVENTARIO.values()
+        if producto["stock"] < STOCK_MINIMO
+    ]
 
 
 def reporte_inventario():
     """Arma el reporte del inventario, lo imprime y lo regresa como texto."""
-    s = "===== INVENTARIO =====\n"
-    aux = 0
-    for k in gestor.INVENTARIO:
-        p = gestor.INVENTARIO[k]
-        linea = p["codigo"] + " | " + p["nombre"] + " | "
-        linea = linea + hacer_cosa(p["precio"]) + " | stock: " + str(p["stock"])
-        if p["stock"] < STOCK_MINIMO:
+    reporte = "===== INVENTARIO =====\n"
+    valor_total = 0
+    for producto in gestor.INVENTARIO.values():
+        linea = (
+            producto["codigo"] + " | " + producto["nombre"] + " | "
+            + formatear_dinero(producto["precio"])
+            + " | stock: " + str(producto["stock"])
+        )
+        if producto["stock"] < STOCK_MINIMO:
             linea = linea + "  <-- STOCK BAJO"
-        s = s + linea + "\n"
-        aux = aux + p["precio"] * p["stock"]
-    s = s + "Valor total del inventario: " + hacer_cosa(aux) + "\n"
-    print(s)
-    return s
+        reporte = reporte + linea + "\n"
+        valor_total = valor_total + producto["precio"] * producto["stock"]
+    reporte = reporte + "Valor total del inventario: "
+    reporte = reporte + formatear_dinero(valor_total) + "\n"
+    print(reporte)
+    return reporte
 
 
 def total_vendido():
     """Suma el total (con IVA) de todas las ventas registradas."""
-    t = 0
-    for v in gestor.VENTAS:
-        t = t + v["total"]
-    return round(t, 2)
+    # Bucle explicito a proposito: sum() usa suma compensada desde
+    # Python 3.12 y podria diferir en el ultimo decimal.
+    total = 0
+    for venta in gestor.VENTAS:
+        total = total + venta["total"]
+    return round(total, 2)
 
 
 def mas_vendidos(n=3):
@@ -68,13 +73,14 @@ def mas_vendidos(n=3):
 
 def resumen_ventas():
     """Arma el resumen de ventas del dia, lo imprime y lo regresa."""
-    s = "===== RESUMEN DE VENTAS =====\n"
-    t = 0
-    for v in gestor.VENTAS:
-        s = s + "Folio " + str(v["folio"]) + ": " + v["nombre"]
-        s = s + " x" + str(v["cantidad"]) + " = " + hacer_cosa(v["total"]) + "\n"
-        t = t + v["total"]
-    s = s + "Numero de ventas: " + str(len(gestor.VENTAS)) + "\n"
-    s = s + "Total del dia: " + hacer_cosa(t) + "\n"
-    print(s)
-    return s
+    reporte = "===== RESUMEN DE VENTAS =====\n"
+    total_dia = 0
+    for venta in gestor.VENTAS:
+        reporte = reporte + "Folio " + str(venta["folio"]) + ": " + venta["nombre"]
+        reporte = reporte + " x" + str(venta["cantidad"]) + " = "
+        reporte = reporte + formatear_dinero(venta["total"]) + "\n"
+        total_dia = total_dia + venta["total"]
+    reporte = reporte + "Numero de ventas: " + str(len(gestor.VENTAS)) + "\n"
+    reporte = reporte + "Total del dia: " + formatear_dinero(total_dia) + "\n"
+    print(reporte)
+    return reporte
