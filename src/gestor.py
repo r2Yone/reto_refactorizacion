@@ -99,6 +99,20 @@ def buscarProducto(texto):
     return temp2
 
 
+def _descuento_por_volumen(subtotal):
+    """Descuento que corresponde al subtotal de una compra (0 si no aplica)."""
+    if subtotal >= UMBRAL_DESCUENTO_ALTO:
+        return subtotal * TASA_DESCUENTO_ALTO
+    if subtotal >= UMBRAL_DESCUENTO_MEDIO:
+        return subtotal * TASA_DESCUENTO_MEDIO
+    return 0
+
+
+def _calcular_iva(base):
+    """IVA que se cobra sobre el monto ya descontado."""
+    return base * TASA_IVA
+
+
 def registrar_venta(codigo, cantidad, cliente=""):
     """Registra una venta completa.
 
@@ -128,15 +142,7 @@ def registrar_venta(codigo, cantidad, cliente=""):
         return None
     # calculo del subtotal
     aux = temp2["precio"] * cantidad
-    # descuentos por volumen de compra
-    desc = 0
-    if aux >= UMBRAL_DESCUENTO_ALTO:
-        desc = aux * TASA_DESCUENTO_ALTO
-    else:
-        if aux >= UMBRAL_DESCUENTO_MEDIO:
-            desc = aux * TASA_DESCUENTO_MEDIO
-        else:
-            desc = 0
+    desc = _descuento_por_volumen(aux)
     # los clientes cuyo codigo empieza con VIP tienen un extra,
     # pero solo si su compra (ya con descuento) pasa de cierto monto
     if cliente != "" and cliente is not None:
@@ -145,7 +151,7 @@ def registrar_venta(codigo, cantidad, cliente=""):
                 if aux - desc > MONTO_MINIMO_VIP:
                     desc = desc + aux * TASA_DESCUENTO_VIP
     base = aux - desc
-    impuesto = base * TASA_IVA
+    impuesto = _calcular_iva(base)
     total = round(base + impuesto, 2)
     # descontar del inventario
     temp2["stock"] = temp2["stock"] - cantidad
@@ -186,13 +192,6 @@ def cotizar(codigo, cantidad):
     if cantidad is None or cantidad <= 0:
         ultimo_error = "cantidad invalida"
         return None
-    aux = INVENTARIO[codigo]["precio"] * cantidad
-    desc = 0
-    if aux >= UMBRAL_DESCUENTO_ALTO:
-        desc = aux * TASA_DESCUENTO_ALTO
-    else:
-        if aux >= UMBRAL_DESCUENTO_MEDIO:
-            desc = aux * TASA_DESCUENTO_MEDIO
-    base = aux - desc
-    total = base + base * TASA_IVA
-    return round(total, 2)
+    subtotal = INVENTARIO[codigo]["precio"] * cantidad
+    base = subtotal - _descuento_por_volumen(subtotal)
+    return round(base + _calcular_iva(base), 2)
