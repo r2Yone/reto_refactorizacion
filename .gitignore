@@ -7,5 +7,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
+# Configuración local de Claude Code (personal, no del proyecto)
+.claude/settings.local.json
+
 # Archivos del sistema operativo
 .DS_Store
