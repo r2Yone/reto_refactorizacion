@@ -22,7 +22,7 @@ Después de cada cambio ejecuta `pytest` y anota el resultado.
 
 | #  | Prompt usado | Cambio realizado | Justificación | Tests OK |
 |----|--------------|------------------|---------------|----------|
-| 1  |              |                  |               |          |
+| 1  | "Elimina el código muerto" (tras aprobar el plan de refactorización generado a partir de `prompt_base.md`) | Se eliminaron `calcular_descuento_viejo` y el bloque comentado `exportar_txt` (gestor), la constante sin uso `MODO_DEBUG`, `reporteViejoCSV` e `import os` (reportes), y la declaración `# -*- coding: utf-8 -*-` de los 4 módulos. Antes de borrar se verificó con búsqueda que nada en `src/` ni `tests/` los usara. | El código que nadie llama confunde al lector y hay que mantenerlo sin que aporte nada; Git ya conserva la historia "por si acaso". El encabezado de codificación sobra en Python 3, donde UTF-8 es el default. Ruff: 20 → 13 (se resolvieron F401, N802, SIM115 y UP009 ×4). | ✅ 20/20 |
 | 2  |              |                  |               |          |
 | 3  |              |                  |               |          |
 | 4  |              |                  |               |          |
