@@ -21,7 +21,7 @@ def productos_stock_bajo():
 
 
 def reporte_inventario():
-    """Arma el reporte del inventario, lo imprime y lo regresa como texto."""
+    """Arma el reporte del inventario y lo regresa como texto."""
     reporte = "===== INVENTARIO =====\n"
     valor_total = 0
     for producto in gestor.INVENTARIO.values():
@@ -36,7 +36,6 @@ def reporte_inventario():
         valor_total = valor_total + producto["precio"] * producto["stock"]
     reporte = reporte + "Valor total del inventario: "
     reporte = reporte + formatear_dinero(valor_total) + "\n"
-    print(reporte)
     return reporte
 
 
@@ -66,7 +65,7 @@ def mas_vendidos(n=3):
 
 
 def resumen_ventas():
-    """Arma el resumen de ventas del dia, lo imprime y lo regresa."""
+    """Arma el resumen de ventas del dia y lo regresa como texto."""
     reporte = "===== RESUMEN DE VENTAS =====\n"
     total_dia = 0
     for venta in gestor.VENTAS:
@@ -76,5 +75,4 @@ def resumen_ventas():
         total_dia = total_dia + venta["total"]
     reporte = reporte + "Numero de ventas: " + str(len(gestor.VENTAS)) + "\n"
     reporte = reporte + "Total del dia: " + formatear_dinero(total_dia) + "\n"
-    print(reporte)
     return reporte

@@ -58,11 +58,11 @@ def opcion_cotizar():
 
 
 def opcion_reporte_inventario():
-    reportes.reporte_inventario()
+    print(reportes.reporte_inventario())
 
 
 def opcion_resumen_ventas():
-    reportes.resumen_ventas()
+    print(reportes.resumen_ventas())
 
 
 def opcion_mas_vendidos():
