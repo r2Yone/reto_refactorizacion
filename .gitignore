@@ -1,0 +1,11 @@
+# Entorno virtual
+.venv/
+
+# Cachés de Python y herramientas
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Archivos del sistema operativo
+.DS_Store
