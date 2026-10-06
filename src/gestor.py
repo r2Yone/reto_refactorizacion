@@ -113,72 +113,81 @@ def _calcular_iva(base):
     return base * TASA_IVA
 
 
-def registrar_venta(codigo, cantidad, cliente=""):
-    """Registra una venta completa.
+def _calcular_descuento(subtotal, cliente):
+    """Descuento total de una venta: por volumen mas el extra VIP.
 
-    Esta funcion hace de todo: valida los datos, calcula descuentos e
-    impuestos, descuenta el stock, genera el folio, arma el ticket en
-    texto y guarda el registro en la lista de ventas. Si algo falla
-    regresa None y deja el motivo en ultimo_error.
+    Los clientes cuyo codigo empieza con VIP reciben un extra, pero solo si
+    su compra (ya con el descuento por volumen) pasa del monto minimo.
+    """
+    descuento = _descuento_por_volumen(subtotal)
+    es_vip = bool(cliente) and cliente.startswith(PREFIJO_VIP)
+    if es_vip and subtotal - descuento > MONTO_MINIMO_VIP:
+        descuento = descuento + subtotal * TASA_DESCUENTO_VIP
+    return descuento
+
+
+def _validar_venta(codigo, cantidad):
+    """Regresa el motivo por el que la venta no procede, o None si es valida."""
+    if codigo is None or codigo == "":
+        return "codigo vacio"
+    if codigo not in INVENTARIO:
+        return "producto no existe"
+    if cantidad is None or cantidad <= 0:
+        return "cantidad invalida"
+    if INVENTARIO[codigo]["stock"] < cantidad:
+        return "stock insuficiente"
+    return None
+
+
+def _generar_ticket(venta):
+    """Arma el ticket en texto plano a partir del registro de la venta."""
+    lineas = [
+        "TIENDA LA ESQUINA",
+        "----------------------------",
+        "Folio: " + str(venta["folio"]),
+        venta["nombre"] + " x" + str(venta["cantidad"]),
+        "Subtotal: $" + str(venta["subtotal"]),
+    ]
+    if venta["descuento"] > 0:
+        lineas.append("Descuento: -$" + str(venta["descuento"]))
+    lineas.append("IVA: $" + str(venta["impuesto"]))
+    lineas.append("TOTAL: $" + str(venta["total"]))
+    return "\n".join(lineas) + "\n"
+
+
+def registrar_venta(codigo, cantidad, cliente=""):
+    """Registra una venta: valida, calcula importes, descuenta el stock,
+    asigna folio y genera el ticket.
+
+    Si algo falla regresa None y deja el motivo en ultimo_error.
     """
     global contadorVentas, ultimo_error
-    temp2 = None
-    if codigo is not None and codigo != "":
-        if codigo in INVENTARIO:
-            if cantidad is not None and cantidad > 0:
-                if INVENTARIO[codigo]["stock"] >= cantidad:
-                    temp2 = INVENTARIO[codigo]
-                else:
-                    ultimo_error = "stock insuficiente"
-                    return None
-            else:
-                ultimo_error = "cantidad invalida"
-                return None
-        else:
-            ultimo_error = "producto no existe"
-            return None
-    else:
-        ultimo_error = "codigo vacio"
+    error = _validar_venta(codigo, cantidad)
+    if error is not None:
+        ultimo_error = error
         return None
-    # calculo del subtotal
-    aux = temp2["precio"] * cantidad
-    desc = _descuento_por_volumen(aux)
-    # los clientes cuyo codigo empieza con VIP tienen un extra,
-    # pero solo si su compra (ya con descuento) pasa de cierto monto
-    if cliente != "" and cliente is not None:
-        if len(cliente) >= len(PREFIJO_VIP):
-            if cliente[0:len(PREFIJO_VIP)] == PREFIJO_VIP:
-                if aux - desc > MONTO_MINIMO_VIP:
-                    desc = desc + aux * TASA_DESCUENTO_VIP
-    base = aux - desc
+
+    producto = INVENTARIO[codigo]
+    subtotal = producto["precio"] * cantidad
+    descuento = _calcular_descuento(subtotal, cliente)
+    base = subtotal - descuento
     impuesto = _calcular_iva(base)
-    total = round(base + impuesto, 2)
-    # descontar del inventario
-    temp2["stock"] = temp2["stock"] - cantidad
+
+    producto["stock"] = producto["stock"] - cantidad
     contadorVentas = contadorVentas + 1
-    venta = {}
-    venta["folio"] = contadorVentas
-    venta["codigo"] = codigo
-    venta["nombre"] = temp2["nombre"]
-    venta["cantidad"] = cantidad
-    venta["subtotal"] = round(aux, 2)
-    venta["descuento"] = round(desc, 2)
-    venta["impuesto"] = round(impuesto, 2)
-    venta["total"] = total
-    venta["cliente"] = cliente
-    venta["fecha"] = datetime.now().strftime(FORMATO_FECHA)
-    # armar el ticket en texto plano
-    t = ""
-    t = t + "TIENDA LA ESQUINA\n"
-    t = t + "----------------------------\n"
-    t = t + "Folio: " + str(venta["folio"]) + "\n"
-    t = t + venta["nombre"] + " x" + str(cantidad) + "\n"
-    t = t + "Subtotal: $" + str(venta["subtotal"]) + "\n"
-    if desc > 0:
-        t = t + "Descuento: -$" + str(venta["descuento"]) + "\n"
-    t = t + "IVA: $" + str(venta["impuesto"]) + "\n"
-    t = t + "TOTAL: $" + str(venta["total"]) + "\n"
-    venta["ticket"] = t
+    venta = {
+        "folio": contadorVentas,
+        "codigo": codigo,
+        "nombre": producto["nombre"],
+        "cantidad": cantidad,
+        "subtotal": round(subtotal, 2),
+        "descuento": round(descuento, 2),
+        "impuesto": round(impuesto, 2),
+        "total": round(base + impuesto, 2),
+        "cliente": cliente,
+        "fecha": datetime.now().strftime(FORMATO_FECHA),
+    }
+    venta["ticket"] = _generar_ticket(venta)
     VENTAS.append(venta)
     return venta
 
