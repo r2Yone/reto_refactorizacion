@@ -6,10 +6,35 @@
 
 **Fecha:** 06 Octubre 2026
 
-Registra aquí **cada refactorización** que realices con Claude Code. Copia el
-prompt tal cual lo escribiste (o un resumen fiel si fue una conversación larga),
-describe el cambio que se aplicó al código y justifica por qué mejora la calidad.
-Después de cada cambio ejecuta `pytest` y anota el resultado.
+Registro de cada refactorización hecha con Claude Code: prompt usado, cambio
+realizado, justificación y resultado de las pruebas. El plan completo está en
+[`PLAN.md`](../PLAN.md) y la reflexión final en [`reflexion.md`](reflexion.md).
+
+## Modos de Claude Code utilizados
+
+| Modo | Para qué se usó |
+|------|-----------------|
+| **Modo plan** (solo lectura) | Exploración inicial con el prompt de [`prompt_base.md`](../prompt_base.md): leer el README y el código, identificar code smells y proponer un plan por fases sin modificar archivos. Se volvió a usar al llegar los documentos de formato de entrega para planear la Fase 4. |
+| **Chat / preguntas** | Resolver las decisiones abiertas del plan (código muerto, `print` en reportes, type hints, destino del PR) y aprender a ejecutar las pruebas por cuenta propia. |
+| **Ejecución con aprobación manual** | Cada edición y cada comando requirió aprobación; Claude explicaba antes qué hacía cada comando. Después de aprobar el flujo, se autorizó un commit por refactorización tras validar. |
+
+## Diagnóstico inicial (code smells)
+
+Detectados en la exploración en modo plan (detalle por archivo en
+[`PLAN.md`](../PLAN.md#code-smells-detectados)):
+
+- **Funciones gigantes:** `registrar_venta` (6 responsabilidades, complejidad 12)
+  y `menu()` (complejidad 17).
+- **Lógica duplicada:** descuento por volumen e IVA repetidos en
+  `registrar_venta` y `cotizar`.
+- **Números mágicos:** `0.16`, `1000`, `500`, `0.10`, `0.05`, `0.02`, `200`, `5`.
+- **Condicionales anidados** hasta 4 niveles (validación y regla VIP).
+- **Nombres crípticos y estilo mixto:** `x`, `aux`, `temp2`, `hacer_cosa`,
+  `contadorVentas`, `hayArchivo`.
+- **Código muerto:** funciones obsoletas, bloque comentado, constante e import
+  sin uso.
+- **Manejo de archivos frágil:** `open()`/`close()` manuales sin `with`.
+- **E/S mezclada con lógica:** reportes que imprimen y regresan texto.
 
 ## Línea base (antes de refactorizar)
 
@@ -33,25 +58,27 @@ Después de cada cambio ejecuta `pytest` y anota el resultado.
 | 8  | "Continuamos; haz un commit por cada refactorización" (siguiente paso del plan: R8, dividir `menu()`) | La cadena de 8 `if/elif` de `menu()` se reemplazó por un diccionario de despacho `OPCIONES` (opción → texto y función). Cada opción quedó en su propia función (`opcion_agregar_producto`, `opcion_registrar_venta`, …); el menú en pantalla se genera a partir del mismo diccionario. Se extrajeron `_mostrar_error`, `_mostrar_menu` y `_cargar_datos_iniciales`; se ordenaron los imports y se renombraron `c`/`n`/`p`/`s`/`cant`/`cli`/`v`/`t` y `ARCHIVO` → `ARCHIVO_DATOS`. | `menu()` mezclaba la navegación con la lógica de las 8 opciones (complejidad 17). Ahora agregar o cambiar una opción toca un solo lugar, y el texto del menú no puede desincronizarse de lo que hace cada opción. La traza de equivalencia simula una sesión completa del menú (todas las opciones, opciones inválidas, entradas no numéricas y errores, con y sin archivo de datos) y compara cada línea impresa y cada prompt: idéntica. Ruff: 2 → **0** (C901, I001). | ✅ 20/20 |
 | 9  | "Mueve los print a main" (respuesta a la decisión pendiente P4 del plan) | `reporte_inventario` y `resumen_ventas` ya no imprimen: solo arman y regresan el texto. `main.py` es ahora quien lo imprime (`print(reportes.reporte_inventario())`). Se actualizaron los docstrings. | Separa la lógica de la entrada/salida: el módulo de reportes produce datos y la interfaz de consola decide qué mostrar. Así los reportes se pueden reutilizar (guardar en archivo, enviar, probar) sin efectos secundarios en pantalla. La traza mostró exactamente 3 diferencias, todas esperadas: lo que se imprimía al llamar esas funciones directamente; el texto regresado y la sesión completa del menú son idénticos. Ruff: 0. | ✅ 20/20 |
 
-> Agrega más filas si realizas más de 5 refactorizaciones.
+## Categoría de cada refactorización
 
-## Reflexión final (10-15 líneas)
+Clasificación según las categorías del documento del reto:
 
-Responde:
+| # | Categoría | Commit |
+|---|-----------|--------|
+| 1 | Eliminar código muerto o comentarios obsoletos | `171f3f6` |
+| 2 | Renombrar para mayor claridad (constantes con nombre en lugar de números mágicos) | `a50b934` |
+| 3 | Extraer funciones de código duplicado | `0360149` |
+| 4 | Extraer funciones de bloques muy largos + simplificar condicionales complejos | `445f136` |
+| 5 | Mejorar el manejo de errores y recursos (`with` para archivos) + renombrar | `04e1fc0` |
+| 6 | Renombrar variables o funciones para mayor claridad | `fde85b5` |
+| 7 | Simplificar lógica (algoritmo manual → `sorted`) | `e60cde0` |
+| 8 | Extraer funciones de bloques muy largos + simplificar condicionales | `e6d7841` |
+| 9 | Separar lógica de entrada/salida | `f8fee3b` |
 
-- ¿Qué tan útil fue Claude Code para detectar y corregir los problemas?
-Claude Code fue muy útil: en pocos minutos analizó el proyecto completo, identificó los code smells y propuso un plan priorizado antes de modificar el código. Con ese plan se aplicaron 9 refactorizaciones en commits atómicos, y ruff pasó de 20 errores a 0 sin romper ninguna prueba.
-- ¿Qué propuso la IA que tú no habías notado?
-Además de los tests, la IA construyó una validación propia (una traza de ~1 500 casos comparada contra el código original), y con ella detectó detalles que yo no habría visto: sum() redondea distinto que un bucle desde Python 3.12, una venta sin descuento guarda 0 entero y no 0.0, y un permiso en settings.json contenía una ruta personal que no debía subirse al repositorio.
-- ¿En qué casos tuviste que corregir o rechazar sus sugerencias?
-Rechacé agregar type hints, decidí separar los print de los reportes y ajusté el flujo de trabajo: avanzar fase por fase, hacer push al final de cada fase, indicar la fase en cada commit y pedir que me explicara cada comando antes de ejecutarlo. Trabajar en modo manual me permitió validar cada paso antes de aprobarlo.
+No se agregaron type hints por decisión del desarrollador.
 
-- ¿Qué aprendiste sobre refactorizar con apoyo de IA?
-La IA reduce drásticamente el tiempo de refactorización, pero el resultado depende del contexto: un buen prompt, un CLAUDE.md con reglas claras y un plan acordado evitan que tome decisiones por su cuenta fuera de lo esperado. El riesgo que veo es usarla para que haga todo el trabajo sin entender lo que hizo. Para mí es una herramienta, no un reemplazo: la IA propone, y el desarrollador valida, entiende y aprueba cada cambio, lo que exige conocer la tecnología. Vivimos un cambio profundo en la forma de desarrollar, y aprender a trabajar con IA ya es parte de nuestro oficio.
+## Resultado final
 
-*(Escribe aquí tu reflexión)*
-La IA en el desarrollo de código es una herramienta invaluable que ayuda a reducir drásticamente los tiempos de desarrollo. Sin embargo, el éxito de los resultados depende en gran medida de las indicaciones que le demos. Dedicar tiempo a construir un buen prompt es crucial para que la IA ejecute las tareas con precisión; de hecho, podemos apoyarnos en la misma IA para perfeccionar estas instrucciones.
-En este proceso, trazar un plan es fundamental. Con una estrategia clara podemos dar seguimiento a las acciones y evitar que la IA se desvíe del objetivo debido a un exceso de "creatividad". Por otro lado, aunque el tiempo de codificación disminuya, es vital invertir tiempo en validar y aprobar cada cambio. Si la IA no cuenta con el contexto adecuado, puede devolver un resultado visualmente correcto, pero respaldado por decisiones automáticas que choquen con el comportamiento esperado del negocio.
-Sin duda alguna, el desarrollo de software actual está fuertemente influenciado por la IA. Esto ha traído un riesgo que ya estamos viviendo: muchos desarrolladores se limitan a pedirle código, arquitecturas o migraciones a la herramienta sin entender qué hace realmente detrás de escena, enfocándose solo en que el programa "funcione". Esto suele ocurrir cuando se dan instrucciones incompletas o al vuelo, sin un contexto profundo ni un plan de acción.
-Desde mi punto de vista, la IA es una tecnología increíble, pero debe usarse como lo que es: una herramienta de asistencia, no un sustituto del pensamiento crítico. El desarrollador debe validar constantemente y, sobre todo, comprender el código generado. Para lograr esto, se requiere un equipo con conocimientos técnicos sólidos. Estamos ante una revolución informática impresionante, y para nosotros los desarrolladores es indispensable aprender a desenvolvernos en este nuevo ecosistema, ya que el presente y el futuro de nuestra profesión están completamente ligados a la IA.
-
+- `pytest`: **20 passed** después de cada una de las 9 refactorizaciones.
+- `ruff check src`: **0 errores** (línea base: 20).
+- Evidencia completa en [`evidencia.md`](evidencia.md).
+- Reflexión final en [`reflexion.md`](reflexion.md).

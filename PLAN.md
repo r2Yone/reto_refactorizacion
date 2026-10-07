@@ -5,7 +5,7 @@ el código** y cómo se fue ejecutando. El análisis inicial se pidió con el pr
 de [`prompt_base.md`](prompt_base.md), que exigía analizar el README y el
 proyecto, proponer un plan por fases y no cambiar nada hasta que el plan fuera
 aprobado. El detalle de cada refactorización (prompt, cambio, justificación y
-resultado de pruebas) está en [`BITACORA.md`](BITACORA.md).
+resultado de pruebas) está en [`docs/bitacora.md`](docs/bitacora.md).
 
 ## Resumen
 

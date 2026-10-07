@@ -20,7 +20,9 @@ El programa ya funciona; no se agregan funcionalidades nuevas.
 - `src/main.py`: menú interactivo de consola.
 - `tests/`: pruebas pytest de caja negra (20 pruebas).
 - `pyproject.toml`: configuración de ruff y pytest.
-- `BITACORA.md`: registro de cada refactorización.
+- `docs/bitacora.md`: registro de cada refactorización.
+- `docs/reflexion.md`: reflexión final; `docs/evidencia.md`: log de pruebas.
+- `PLAN.md`: análisis inicial y plan por fases.
 
 ## Comandos (Windows, desde la raíz del repo)
 
@@ -43,7 +45,7 @@ cd src && ../.venv/Scripts/python.exe main.py  # app interactiva (opcional)
    `gestor.VENTAS` (list) siguen siendo atributos del módulo, y
    `gestor.reiniciar_sistema()` los vacía.
 4. **Una refactorización a la vez.** Después de cada una: correr `pytest` y
-   `ruff check src`, revisar el diff, registrar la fila en `BITACORA.md` y
+   `ruff check src`, revisar el diff, registrar la fila en `docs/bitacora.md` y
    hacer un commit atómico.
 5. **No hacer commits ni push sin autorización explícita del usuario.**
 
