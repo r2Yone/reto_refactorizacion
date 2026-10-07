@@ -14,43 +14,96 @@ números mágicos, estado global, código muerto, anidamiento excesivo, estilos 
 nombrado mezclados... Tu misión es **mejorarlo sin romperlo**, usando Claude
 Code como asistente.
 
+## Resultado del reto
+
+El código de `src/` se refactorizó en **9 pasos atómicos** sin cambiar el
+comportamiento: las **20 pruebas pasan** después de cada cambio y
+`ruff check src` pasó de **20 errores a 0**.
+
+| Documento | Contenido |
+|-----------|-----------|
+| [`PLAN.md`](PLAN.md) | Análisis inicial, plan por fases, decisiones y cómo se siguió |
+| [`docs/bitacora.md`](docs/bitacora.md) | Prompt, cambio, justificación y resultado de cada refactorización |
+| [`docs/reflexion.md`](docs/reflexion.md) | Aprendizajes y técnicas de prompting que funcionaron (y cuáles no) |
+| [`docs/evidencia.md`](docs/evidencia.md) | Salida de `pytest` y `ruff` sobre el código final |
+| [`CLAUDE.md`](CLAUDE.md) | Contexto, reglas y trampas conocidas para Claude Code |
+
 ### Estructura del proyecto
 
 ```
 .
 ├── src/
-│   ├── gestor.py        # Lógica de productos y ventas
-│   ├── almacen.py       # Carga y guardado de datos (JSON)
-│   ├── reportes.py      # Reportes e indicadores
-│   └── main.py          # Menú interactivo de consola
-├── tests/               # Suite de pruebas (pytest) — NO la modifiques
-├── datos_ejemplo.json   # Datos de ejemplo para el menú interactivo
-├── requirements.txt
-├── pyproject.toml       # Configuración del linter (ruff) — NO la modifiques
-└── BITACORA_TEMPLATE.md # Plantilla para tu bitácora de prompts
+│   ├── gestor.py         # Lógica de productos y ventas
+│   ├── almacen.py        # Carga y guardado de datos (JSON)
+│   ├── reportes.py       # Reportes e indicadores
+│   └── main.py           # Menú interactivo de consola
+├── tests/                # Suite de pruebas (pytest) — NO la modifiques
+├── docs/
+│   ├── bitacora.md       # Registro de cada refactorización
+│   ├── reflexion.md      # Aprendizajes y conclusiones
+│   └── evidencia.md      # Log de pruebas y linter
+├── .claude/settings.json # Permisos del proyecto: bloquea editar tests/ y pyproject.toml
+├── CLAUDE.md             # Instrucciones para Claude Code
+├── .claudeignore         # Archivos que Claude Code no debe leer
+├── PLAN.md               # Plan de trabajo
+├── prompt_base.md        # Prompt usado para el análisis inicial
+├── datos_ejemplo.json    # Datos de ejemplo para el menú interactivo
+├── requirements.txt      # Dependencias (pytest, ruff)
+├── pyproject.toml        # Configuración del linter (ruff) — NO la modifiques
+└── BITACORA_TEMPLATE.md  # Plantilla original de la bitácora
 ```
 
 ## Instalación y ejecución
 
-Requiere Python 3.10 o superior.
+### Requisitos previos
+
+- Python **3.10 o superior** (probado con 3.14).
+- Git.
+- Dependencias de desarrollo en `requirements.txt`: `pytest>=8.0` y
+  `ruff>=0.6`.
+
+### Clonar e instalar
 
 ```bash
-# 1. Crear y activar un entorno virtual
+# 1. Clonar el repositorio
+git clone https://github.com/r2Yone/reto_refactorizacion.git
+cd reto_refactorizacion
+
+# 2. Crear y activar un entorno virtual
 python -m venv .venv
-source .venv/bin/activate        # En Windows: .venv\Scripts\activate
+source .venv/bin/activate          # Linux / macOS
+# .venv\Scripts\Activate.ps1       # Windows (PowerShell)
+# .venv\Scripts\activate.bat       # Windows (cmd)
 
-# 2. Instalar dependencias
+# 3. Instalar dependencias
 pip install -r requirements.txt
+```
 
-# 3. Ejecutar la suite de pruebas (deben pasar TODAS)
+> En PowerShell, si la activación marca "ejecución de scripts deshabilitada",
+> ejecuta una vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+
+### Ejecutar las pruebas y el linter
+
+```bash
+# Suite de pruebas (deben pasar las 20)
 pytest
 
-# 4. Ejecutar el linter (al inicio reporta ~20 problemas; al final: 0)
+# Linter (resultado esperado: "All checks passed!")
 ruff check src
-
-# 5. (Opcional) Probar la aplicación interactiva
-cd src && python main.py
 ```
+
+### (Opcional) Probar la aplicación interactiva
+
+```bash
+# Desde la raíz del repositorio
+python src/main.py
+```
+
+> La app lee y guarda `datos_ejemplo.json` en el **directorio actual**. Al salir
+> con la opción 8 sobrescribe ese archivo; para restaurarlo:
+> `git checkout -- datos_ejemplo.json`. Si se ejecuta desde `src/`, no encuentra
+> los datos de ejemplo y crea un archivo nuevo ahí. Es el comportamiento
+> original y se conservó a propósito.
 
 ## Instrucciones del reto
 
