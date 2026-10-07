@@ -16,6 +16,7 @@ realizado, justificación y resultado de las pruebas. El plan completo está en
 |------|-----------------|
 | **Modo plan** (solo lectura) | Exploración inicial con el prompt de [`prompt_base.md`](../prompt_base.md): leer el README y el código, identificar code smells y proponer un plan por fases sin modificar archivos. Se volvió a usar al llegar los documentos de formato de entrega para planear la Fase 4. |
 | **Chat / preguntas** | Resolver las decisiones abiertas del plan (código muerto, `print` en reportes, type hints, destino del PR) y aprender a ejecutar las pruebas por cuenta propia. |
+| **Modo automático** | Se usó al inicio de la ejecución. Al aprobar comandos de forma permanente se agregaron permisos al `settings.json` compartido que no se alcanzaron a revisar, así que se cambió al modo manual. |
 | **Ejecución con aprobación manual** | Cada edición y cada comando requirió aprobación; Claude explicaba antes qué hacía cada comando. Después de aprobar el flujo, se autorizó un commit por refactorización tras validar. |
 
 ## Diagnóstico inicial (code smells)

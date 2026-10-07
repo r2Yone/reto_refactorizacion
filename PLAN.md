@@ -124,7 +124,7 @@ Se volvió al modo plan para comparar cada requisito con el estado del proyecto:
 | Bitácora en `/docs/bitacora.md`, con code smells y modos de Claude Code usados | `git mv` (conserva el historial) + secciones de diagnóstico, modos y categorías | `0c09d3e` |
 | Evidencia de pruebas y linter | [`docs/evidencia.md`](docs/evidencia.md) | `93f31fa` |
 | README con requisitos, clonado, instalación, pruebas y linter | README actualizado | `666a68f` |
-| Reflexión en `/docs/reflexion.md`, con técnicas de prompting y qué funcionó y qué no | [`docs/reflexion.md`](docs/reflexion.md) | Pendiente de revisión |
+| Reflexión en `/docs/reflexion.md`, con técnicas de prompting y qué funcionó y qué no | [`docs/reflexion.md`](docs/reflexion.md) | ✅ Revisada por el desarrollador |
 | Pull Request con título y secciones definidas | Título y descripción preparados para GitHub | ⏳ Pendiente de autorización |
 
 ## 3. Decisiones tomadas durante el plan
