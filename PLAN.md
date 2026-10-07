@@ -14,7 +14,8 @@ resultado de pruebas) está en [`docs/bitacora.md`](docs/bitacora.md).
 | 0 | Preparar el entorno y medir la línea base | ✅ Completada |
 | 1 | Configurar el proyecto para Claude Code | ✅ Completada |
 | 2 | Refactorizar `src/` en pasos atómicos | ✅ Completada (9 refactorizaciones) |
-| 3 | Validación final, reflexión y Pull Request | ✅ Completada |
+| 3 | Validación final y reflexión | ✅ Completada |
+| 4 | Ajustes al formato de entrega y Pull Request | 🔄 En curso (PR pendiente de autorización) |
 
 | Métrica | Inicio | Final |
 |---------|--------|-------|
@@ -109,9 +110,22 @@ Se ordenaron de menor a mayor riesgo y cada una se validó con:
 | Actividad | Estado |
 |-----------|--------|
 | Validación final: 20/20 pruebas, ruff en 0, `tests/` y `pyproject.toml` sin cambios desde el commit inicial, prueba manual del menú | ✅ |
-| Reflexión en `BITACORA.md` | ✅ |
+| Reflexión final (hoy en [`docs/reflexion.md`](docs/reflexion.md)) | ✅ |
 | `PLAN.md` (este documento) | ✅ |
-| Push y Pull Request `feature/refactorizacion` → `main` | ⏳ Pendiente de autorización |
+
+### Fase 4: Ajustes al formato de entrega
+
+Al terminar la Fase 3 llegaron los documentos del curso *M1. Plan de Reto
+Refactoring* y *M1. Formato de entrega*, con requisitos que el README no tenía.
+Se volvió al modo plan para comparar cada requisito con el estado del proyecto:
+
+| Requisito nuevo | Acción | Commit |
+|-----------------|--------|--------|
+| Bitácora en `/docs/bitacora.md`, con code smells y modos de Claude Code usados | `git mv` (conserva el historial) + secciones de diagnóstico, modos y categorías | `0c09d3e` |
+| Evidencia de pruebas y linter | [`docs/evidencia.md`](docs/evidencia.md) | `93f31fa` |
+| README con requisitos, clonado, instalación, pruebas y linter | README actualizado | `666a68f` |
+| Reflexión en `/docs/reflexion.md`, con técnicas de prompting y qué funcionó y qué no | [`docs/reflexion.md`](docs/reflexion.md) | Pendiente de revisión |
+| Pull Request con título y secciones definidas | Título y descripción preparados para GitHub | ⏳ Pendiente de autorización |
 
 ## 3. Decisiones tomadas durante el plan
 
@@ -127,6 +141,8 @@ antes de cada fase, en lugar de que la IA las resolviera por su cuenta:
 | ¿Commits por archivo o por fase? | Un commit por refactorización, con la fase en el mensaje |
 | ¿Cuándo hacer push? | Al final de cada fase |
 | ¿Ignorar toda la carpeta `.claude/`? | No, solo `settings.local.json`; `settings.json` se versiona |
+| ¿Destino del PR? (el README dice el repo propio; el PDF, el repo base) | Repo propio, `feature/refactorizacion` → `main`: el repositorio no es un fork |
+| ¿Mover la bitácora a `/docs`? | Sí, con la reflexión en un archivo aparte |
 
 ## 4. Desviaciones del plan original
 
@@ -136,6 +152,8 @@ antes de cada fase, en lugar de que la IA las resolviera por su cuenta:
 - **Validación reforzada:** el plan solo contemplaba `pytest` y `ruff`. Se
   agregó la traza de equivalencia porque las 20 pruebas no cubren casos como
   el formato de los tickets, los mensajes de error o el menú.
+- **Fase 4 no prevista:** los documentos de formato de entrega llegaron
+  después de cerrar la Fase 3 y obligaron a reorganizar la documentación.
 
 ## 5. Hallazgos que cambiaron decisiones de implementación
 
