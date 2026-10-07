@@ -16,7 +16,7 @@ Además de los tests, la IA construyó una validación propia (una traza de ~1 5
 
 ## ¿En qué casos tuve que corregir o rechazar sus sugerencias?
 
-Rechacé agregar type hints, decidí separar los print de los reportes y ajusté el flujo de trabajo: avanzar fase por fase según el plan creado, hacer push al final de cada fase, indicar la fase en cada commit y pedir que me explicara cada comando antes de ejecutarlo. Trabajé en modo PLAN para analizar los requerimientos y crear un plan, posteriormente pasé a trabajar en modo auto, sin embargo eso creo que se agregaran unos settings que yo no pude validar en su momento, por lo cual opté por cambiar a un modo manual que me permitió validar cada paso antes de aprobarlo.
+Rechacé agregar type hints, decidí separar los print de los reportes y ajusté el flujo de trabajo: avanzar fase por fase según el plan creado, hacer push al final de cada fase, indicar la fase en cada commit y pedir que me explicara cada comando antes de ejecutarlo. Trabajé en modo PLAN para analizar los requerimientos y crear un plan, posteriormente pasé a trabajar en modo auto, sin embargo eso provocó que se agregaran unos settings que yo no pude validar en su momento, por lo cual opté por cambiar a un modo manual que me permitió validar cada paso antes de aprobarlo.
 
 ## ¿Qué aprendí sobre refactorizar con apoyo de IA?
 
