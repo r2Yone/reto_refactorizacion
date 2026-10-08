@@ -48,8 +48,7 @@ Detectados en la exploración en modo plan (detalle por archivo en
 
 > Cada prompt de esta tabla es una instrucción autocontenida: reúne lo que pedí
 > en el chat y la tarea detallada del plan aprobado ([`PLAN.md`](../PLAN.md))
-> que Claude ejecutó en ese paso. En el chat los mensajes eran más cortos
-> (por ejemplo, "continuamos") porque el detalle ya estaba en el plan.
+> que Claude ejecutó en ese paso. 
 
 | #  | Prompt usado | Cambio realizado | Justificación | Tests OK |
 |----|--------------|------------------|---------------|----------|
