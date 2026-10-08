@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(tests/**)",
+      "Write(tests/**)",
+      "Edit(pyproject.toml)",
+      "Write(pyproject.toml)"
+    ]
+  }
+}

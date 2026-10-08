@@ -1,0 +1,14 @@
+# Entorno virtual
+.venv/
+
+# Cachés de Python y herramientas
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Configuración local de Claude Code (personal, no del proyecto)
+.claude/settings.local.json
+
+# Archivos del sistema operativo
+.DS_Store
