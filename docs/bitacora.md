@@ -2,9 +2,9 @@
 
 **Nombre:** Arturo Guzmán Yonemoto
 
-**Matrícula:** Pendiente
+**Matrícula:** arturo.gy@hotmail.com
 
-**Fecha:** 06 Octubre 2026
+**Fecha:** 07 Octubre 2026
 
 Registro de cada refactorización hecha con Claude Code: prompt usado, cambio
 realizado, justificación y resultado de las pruebas. El plan completo está en
